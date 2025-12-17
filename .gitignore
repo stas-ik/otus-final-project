@@ -14,6 +14,7 @@ vendor/
 
 # Configs
 config.local.yaml
+config.yaml
 /.env
 
 # Coverage

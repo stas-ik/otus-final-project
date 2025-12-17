@@ -1,0 +1,5 @@
+dsn: postgres://USER:PASS@localhost:5432/DBNAME?sslmode=disable
+path: ./migrations
+kind: sql # или "go"
+lock_key: 7243392
+schema_table: schema_migrations
