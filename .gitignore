@@ -1,0 +1,20 @@
+# Binaries
+bin/
+dist/
+*.exe
+*.out
+*.test
+
+# Go builds
+vendor/
+
+# IDE
+.idea/
+.vscode/
+
+# Configs
+config.local.yaml
+/.env
+
+# Coverage
+coverage.*
