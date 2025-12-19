@@ -30,7 +30,7 @@ func main() {
 	root.AddCommand(cmdCreate(flags), cmdUp(flags), cmdDown(flags), cmdRedo(flags), cmdStatus(flags), cmdDBVersion(flags))
 
 	if err := root.Execute(); err != nil {
-		fmt.Fprintln(os.Stderr, err)
+		_, _ = fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
 }
@@ -67,7 +67,7 @@ func cmdCreate(flags *pflag.FlagSet) *cobra.Command {
 			if err != nil {
 				return err
 			}
-			fmt.Fprintf(cmd.OutOrStdout(), "Created %s\n", path)
+			_, _ = fmt.Fprintf(cmd.OutOrStdout(), "Created %s\n", path)
 			return nil
 		},
 	}
@@ -114,9 +114,9 @@ func cmdStatus(flags *pflag.FlagSet) *cobra.Command {
 			return err
 		}
 		w := cmd.OutOrStdout()
-		fmt.Fprintln(w, "STATUS\tUPDATED_AT\tVERSION\tNAME")
+		_, _ = fmt.Fprintln(w, "STATUS\tUPDATED_AT\tVERSION\tNAME")
 		for _, r := range rows {
-			fmt.Fprintf(w, "%s\t%s\t%d\t%s\n", r.Status, r.UpdatedAt.Format(time.RFC3339), r.Version, r.Name)
+			_, _ = fmt.Fprintf(w, "%s\t%s\t%d\t%s\n", r.Status, r.UpdatedAt.Format(time.RFC3339), r.Version, r.Name)
 		}
 		return nil
 	}}
@@ -132,7 +132,7 @@ func cmdDBVersion(flags *pflag.FlagSet) *cobra.Command {
 		if err != nil {
 			return err
 		}
-		fmt.Fprintln(cmd.OutOrStdout(), v)
+		_, _ = fmt.Fprintln(cmd.OutOrStdout(), v)
 		return nil
 	}}
 }

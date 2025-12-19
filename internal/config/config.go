@@ -1,3 +1,4 @@
+// Package config provides tools for loading configuration.
 package config
 
 import (
@@ -20,6 +21,7 @@ type Config struct {
 	SchemaTable string `mapstructure:"schema_table"`
 }
 
+// Default returns the default configuration.
 func Default() Config {
 	return Config{
 		Path:        "./migrations",

@@ -8,12 +8,14 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
+// DB is a wrapper over the PostgreSQL connection pool.
 type DB struct {
 	Pool        *pgxpool.Pool
 	SchemaTable string
 	LockKey     int64
 }
 
+// Connect creates a new database connection and initializes service tables.
 func Connect(ctx context.Context, dsn, schemaTable string, lockKey int64) (*DB, error) {
 	cfg, err := pgxpool.ParseConfig(dsn)
 	if err != nil {
@@ -31,6 +33,7 @@ func Connect(ctx context.Context, dsn, schemaTable string, lockKey int64) (*DB, 
 	return db, nil
 }
 
+// Close closes the connection pool.
 func (d *DB) Close() { d.Pool.Close() }
 
 func (d *DB) ensureTables(ctx context.Context) error {
