@@ -1,7 +1,7 @@
 .PHONY: build test lint docker-build run-test-race
 
 BINARY_NAME=gomigrator
-GO_VERSION=1.25
+GO_VERSION=1.24
 
 build:
 	go build -o $(BINARY_NAME) ./cmd/gomigrator/main.go
