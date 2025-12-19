@@ -49,7 +49,7 @@ func TestPublicAPI_InvalidDSN(t *testing.T) {
 	})
 }
 
-func TestPublicAPI_UnknownKind(t *testing.T) {
+func TestPublicAPI_UnknownKind(_ *testing.T) {
 	// Мы не можем легко протестировать успех без реальной БД или сложных моков,
 	// но можем протестировать проверку типа миграции (kind), если DSN корректен по формату,
 	// но подключение не требуется немедленно (хотя Connect в api.go вызывается сразу).

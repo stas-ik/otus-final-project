@@ -26,8 +26,8 @@ func TestDefault(t *testing.T) {
 
 func TestLoad(t *testing.T) {
 	t.Run("minimal dsn via env", func(t *testing.T) {
-		os.Setenv("GOMIGRATOR_DSN", "postgres://user:pass@localhost:5432/db")
-		defer os.Unsetenv("GOMIGRATOR_DSN")
+		_ = os.Setenv("GOMIGRATOR_DSN", "postgres://user:pass@localhost:5432/db")
+		defer func() { _ = os.Unsetenv("GOMIGRATOR_DSN") }()
 
 		c, err := Load(nil, "")
 		if err != nil {

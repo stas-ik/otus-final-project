@@ -32,10 +32,10 @@ func TestCommandSetup(t *testing.T) {
 	addCommonFlags(fs)
 
 	// Just verify commands can be created without panic
-	t.Run("CreateUp", func(t *testing.T) { _ = cmdUp(fs) })
-	t.Run("CreateDown", func(t *testing.T) { _ = cmdDown(fs) })
-	t.Run("CreateRedo", func(t *testing.T) { _ = cmdRedo(fs) })
-	t.Run("CreateStatus", func(t *testing.T) { _ = cmdStatus(fs) })
-	t.Run("CreateDBVersion", func(t *testing.T) { _ = cmdDBVersion(fs) })
-	t.Run("CreateCreate", func(t *testing.T) { _ = cmdCreate(fs) })
+	t.Run("CreateUp", func(_ *testing.T) { _ = cmdUp(fs) })
+	t.Run("CreateDown", func(_ *testing.T) { _ = cmdDown(fs) })
+	t.Run("CreateRedo", func(_ *testing.T) { _ = cmdRedo(fs) })
+	t.Run("CreateStatus", func(_ *testing.T) { _ = cmdStatus(fs) })
+	t.Run("CreateDBVersion", func(_ *testing.T) { _ = cmdDBVersion(fs) })
+	t.Run("CreateCreate", func(_ *testing.T) { _ = cmdCreate(fs) })
 }
