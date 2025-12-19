@@ -62,7 +62,9 @@ func (d *DB) WithAdvisoryLock(ctx context.Context, fn func(context.Context) erro
 	if _, err := conn.Exec(ctx, "SELECT pg_advisory_lock($1)", d.LockKey); err != nil {
 		return err
 	}
-	defer conn.Exec(ctx, "SELECT pg_advisory_unlock($1)", d.LockKey)
+	defer func() {
+		_, _ = conn.Exec(ctx, "SELECT pg_advisory_unlock($1)", d.LockKey)
+	}()
 	return fn(ctx)
 }
 

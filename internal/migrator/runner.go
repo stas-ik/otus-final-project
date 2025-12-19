@@ -136,33 +136,33 @@ func (r *Runner) applyGo(ctx context.Context, s GoStep, up bool) error {
 	started := time.Now()
 	if up {
 		if _, err := tx.Exec(ctx, fmt.Sprintf("INSERT INTO %s(version,name,checksum,status,updated_at) VALUES($1,$2,$3,'applying',now())", r.SchemaTable), s.Version, s.Name, "go://checksum"); err != nil {
-			tx.Rollback(ctx)
+			_ = tx.Rollback(ctx)
 			return err
 		}
 		if err := s.Up(tx); err != nil {
 			_, _ = tx.Exec(ctx, fmt.Sprintf("UPDATE %s SET status='failed', updated_at=now(), error_text=$2 WHERE version=$1", r.SchemaTable), s.Version, err.Error())
-			tx.Rollback(ctx)
+			_ = tx.Rollback(ctx)
 			return fmt.Errorf("up %d_%s failed: %w", s.Version, s.Name, err)
 		}
 		dur := time.Since(started)
 		if _, err := tx.Exec(ctx, fmt.Sprintf("UPDATE %s SET status='applied', applied_at=now(), updated_at=now(), execution_ms=$2, error_text=NULL WHERE version=$1", r.SchemaTable), s.Version, dur.Milliseconds()); err != nil {
-			tx.Rollback(ctx)
+			_ = tx.Rollback(ctx)
 			return err
 		}
 	} else {
 		if _, err := tx.Exec(ctx, fmt.Sprintf("UPDATE %s SET status='applying', updated_at=now() WHERE version=$1", r.SchemaTable), s.Version); err != nil {
-			tx.Rollback(ctx)
+			_ = tx.Rollback(ctx)
 			return err
 		}
 		if s.Down != nil {
 			if err := s.Down(tx); err != nil {
 				_, _ = tx.Exec(ctx, fmt.Sprintf("UPDATE %s SET status='failed', updated_at=now(), error_text=$2 WHERE version=$1", r.SchemaTable), s.Version, err.Error())
-				tx.Rollback(ctx)
+				_ = tx.Rollback(ctx)
 				return fmt.Errorf("down %d_%s failed: %w", s.Version, s.Name, err)
 			}
 		}
 		if _, err := tx.Exec(ctx, fmt.Sprintf("DELETE FROM %s WHERE version=$1", r.SchemaTable), s.Version); err != nil {
-			tx.Rollback(ctx)
+			_ = tx.Rollback(ctx)
 			return err
 		}
 	}
@@ -245,29 +245,29 @@ func (r *Runner) applyOne(ctx context.Context, s Step, up bool) error {
 	// пометить как выполняемую
 	if up {
 		if _, err := tx.Exec(ctx, fmt.Sprintf("INSERT INTO %s(version,name,checksum,status,updated_at) VALUES($1,$2,$3,'applying',now())", r.SchemaTable), s.Version, s.Name, s.Checksum); err != nil {
-			tx.Rollback(ctx)
+			_ = tx.Rollback(ctx)
 			return err
 		}
 	} else {
 		if _, err := tx.Exec(ctx, fmt.Sprintf("UPDATE %s SET status='applying', updated_at=now() WHERE version=$1", r.SchemaTable), s.Version); err != nil {
-			tx.Rollback(ctx)
+			_ = tx.Rollback(ctx)
 			return err
 		}
 	}
 	if _, err := tx.Exec(ctx, sql); err != nil {
 		_, _ = tx.Exec(ctx, fmt.Sprintf("UPDATE %s SET status='failed', updated_at=now(), error_text=$2 WHERE version=$1", r.SchemaTable), s.Version, err.Error())
-		tx.Rollback(ctx)
+		_ = tx.Rollback(ctx)
 		return fmt.Errorf("%s %d_%s failed: %w", action, s.Version, s.Name, err)
 	}
 	dur := time.Since(started)
 	if up {
 		if _, err := tx.Exec(ctx, fmt.Sprintf("UPDATE %s SET status='applied', applied_at=now(), updated_at=now(), execution_ms=$2, error_text=NULL WHERE version=$1", r.SchemaTable), s.Version, dur.Milliseconds()); err != nil {
-			tx.Rollback(ctx)
+			_ = tx.Rollback(ctx)
 			return err
 		}
 	} else {
 		if _, err := tx.Exec(ctx, fmt.Sprintf("DELETE FROM %s WHERE version=$1", r.SchemaTable), s.Version); err != nil {
-			tx.Rollback(ctx)
+			_ = tx.Rollback(ctx)
 			return err
 		}
 	}
