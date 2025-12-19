@@ -1,3 +1,4 @@
+// Package postgres provides a PostgreSQL driver for migrations.
 package postgres
 
 import (
@@ -55,8 +56,9 @@ CREATE UNIQUE INDEX IF NOT EXISTS %s_version_uq ON %s (version);
 	return err
 }
 
+// WithAdvisoryLock executes the given function within a PostgreSQL advisory lock.
 func (d *DB) WithAdvisoryLock(ctx context.Context, fn func(context.Context) error) error {
-	// блокировка на уровне сессии с использованием выделенного соединения
+	// session-level lock using a dedicated connection
 	conn, err := d.Pool.Acquire(ctx)
 	if err != nil {
 		return err
@@ -71,14 +73,19 @@ func (d *DB) WithAdvisoryLock(ctx context.Context, fn func(context.Context) erro
 	return fn(ctx)
 }
 
+// MigrationStatus represents the status of a migration.
 type MigrationStatus string
 
 const (
-	StatusApplied  MigrationStatus = "applied"
+	// StatusApplied indicates the migration has been successfully applied.
+	StatusApplied MigrationStatus = "applied"
+	// StatusApplying indicates the migration is currently being applied.
 	StatusApplying MigrationStatus = "applying"
-	StatusFailed   MigrationStatus = "failed"
+	// StatusFailed indicates the migration attempt failed.
+	StatusFailed MigrationStatus = "failed"
 )
 
+// Record represents a migration record in the database.
 type Record struct {
 	Version     int64
 	Name        string

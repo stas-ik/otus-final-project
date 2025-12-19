@@ -1,3 +1,4 @@
+// Package main is the entry point for the gomigrator CLI.
 package main
 
 import (
@@ -74,7 +75,7 @@ func cmdCreate(flags *pflag.FlagSet) *cobra.Command {
 }
 
 func cmdUp(flags *pflag.FlagSet) *cobra.Command {
-	return &cobra.Command{Use: "up", Short: "Apply all pending migrations", RunE: func(cmd *cobra.Command, args []string) error {
+	return &cobra.Command{Use: "up", Short: "Apply all pending migrations", RunE: func(_ *cobra.Command, _ []string) error {
 		c, err := loadConfig(flags)
 		if err != nil {
 			return err
@@ -84,7 +85,7 @@ func cmdUp(flags *pflag.FlagSet) *cobra.Command {
 }
 
 func cmdDown(flags *pflag.FlagSet) *cobra.Command {
-	return &cobra.Command{Use: "down", Short: "Rollback the last migration", RunE: func(cmd *cobra.Command, args []string) error {
+	return &cobra.Command{Use: "down", Short: "Rollback the last migration", RunE: func(_ *cobra.Command, _ []string) error {
 		c, err := loadConfig(flags)
 		if err != nil {
 			return err
@@ -94,7 +95,7 @@ func cmdDown(flags *pflag.FlagSet) *cobra.Command {
 }
 
 func cmdRedo(flags *pflag.FlagSet) *cobra.Command {
-	return &cobra.Command{Use: "redo", Short: "Redo the last migration (down+up)", RunE: func(cmd *cobra.Command, args []string) error {
+	return &cobra.Command{Use: "redo", Short: "Redo the last migration (down+up)", RunE: func(_ *cobra.Command, _ []string) error {
 		c, err := loadConfig(flags)
 		if err != nil {
 			return err
@@ -104,7 +105,7 @@ func cmdRedo(flags *pflag.FlagSet) *cobra.Command {
 }
 
 func cmdStatus(flags *pflag.FlagSet) *cobra.Command {
-	return &cobra.Command{Use: "status", Short: "Show migration status table", RunE: func(cmd *cobra.Command, args []string) error {
+	return &cobra.Command{Use: "status", Short: "Show migration status table", RunE: func(cmd *cobra.Command, _ []string) error {
 		c, err := loadConfig(flags)
 		if err != nil {
 			return err
@@ -123,7 +124,7 @@ func cmdStatus(flags *pflag.FlagSet) *cobra.Command {
 }
 
 func cmdDBVersion(flags *pflag.FlagSet) *cobra.Command {
-	return &cobra.Command{Use: "dbversion", Short: "Print the last applied version", RunE: func(cmd *cobra.Command, args []string) error {
+	return &cobra.Command{Use: "dbversion", Short: "Print the last applied version", RunE: func(cmd *cobra.Command, _ []string) error {
 		c, err := loadConfig(flags)
 		if err != nil {
 			return err

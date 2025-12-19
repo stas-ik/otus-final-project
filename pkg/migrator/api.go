@@ -1,3 +1,4 @@
+// Package migrator provides the public API for running migrations.
 package migrator
 
 import (
@@ -9,7 +10,7 @@ import (
 	im "migrator/internal/migrator"
 )
 
-// RunUp применяет все ожидающие миграции согласно конфигурации.
+// RunUp applies all pending migrations according to the configuration.
 func RunUp(ctx context.Context, c icfg.Config) error {
 	db, err := ipg.Connect(ctx, c.DSN, c.SchemaTable, c.LockKey)
 	if err != nil {
@@ -29,6 +30,7 @@ func RunUp(ctx context.Context, c icfg.Config) error {
 	return fmt.Errorf("unknown kind: %s", c.Kind)
 }
 
+// RunDown rolls back the last applied migration.
 func RunDown(ctx context.Context, c icfg.Config) error {
 	db, err := ipg.Connect(ctx, c.DSN, c.SchemaTable, c.LockKey)
 	if err != nil {
@@ -48,6 +50,7 @@ func RunDown(ctx context.Context, c icfg.Config) error {
 	return fmt.Errorf("unknown kind: %s", c.Kind)
 }
 
+// RunRedo rolls back and then reapplies the last migration.
 func RunRedo(ctx context.Context, c icfg.Config) error {
 	db, err := ipg.Connect(ctx, c.DSN, c.SchemaTable, c.LockKey)
 	if err != nil {
@@ -70,6 +73,7 @@ func RunRedo(ctx context.Context, c icfg.Config) error {
 	return fmt.Errorf("unknown kind: %s", c.Kind)
 }
 
+// Status returns the migration status for all migrations.
 func Status(ctx context.Context, c icfg.Config) ([]im.StatusRow, error) {
 	db, err := ipg.Connect(ctx, c.DSN, c.SchemaTable, c.LockKey)
 	if err != nil {
@@ -80,6 +84,7 @@ func Status(ctx context.Context, c icfg.Config) ([]im.StatusRow, error) {
 	return r.Status(ctx)
 }
 
+// DBVersion returns the current database migration version.
 func DBVersion(ctx context.Context, c icfg.Config) (int64, error) {
 	db, err := ipg.Connect(ctx, c.DSN, c.SchemaTable, c.LockKey)
 	if err != nil {

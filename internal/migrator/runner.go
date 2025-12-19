@@ -10,21 +10,23 @@ import (
 	pg "migrator/internal/driver/postgres"
 )
 
+// Runner executes SQL and Go migrations.
 type Runner struct {
 	DB          *pg.DB
 	SchemaTable string
 }
 
+// NewRunner creates a new Runner instance.
 func NewRunner(db *pg.DB) *Runner { return &Runner{DB: db, SchemaTable: db.SchemaTable} }
 
-// Up применяет все ожидающие SQL-миграции, найденные в каталоге.
+// Up applies all pending SQL migrations found in the directory.
 func (r *Runner) Up(ctx context.Context, steps []Step) error {
 	return r.DB.WithAdvisoryLock(ctx, func(ctx context.Context) error {
 		applied, err := r.loadApplied(ctx)
 		if err != nil {
 			return err
 		}
-		// отфильтровать ожидающие
+		// filter pending
 		pending := make([]Step, 0)
 		for _, s := range steps {
 			if _, ok := applied[s.Version]; !ok {
@@ -41,7 +43,7 @@ func (r *Runner) Up(ctx context.Context, steps []Step) error {
 	})
 }
 
-// Down откатывает последнюю применённую миграцию.
+// Down rolls back the last applied migration.
 func (r *Runner) Down(ctx context.Context, steps []Step) error {
 	return r.DB.WithAdvisoryLock(ctx, func(ctx context.Context) error {
 		applied, err := r.loadApplied(ctx)
@@ -57,7 +59,7 @@ func (r *Runner) Down(ctx context.Context, steps []Step) error {
 		if lastVer < 0 {
 			return nil
 		}
-		// найти шаг по версии
+		// find step by version
 		var last Step
 		found := false
 		for _, s := range steps {
@@ -74,6 +76,7 @@ func (r *Runner) Down(ctx context.Context, steps []Step) error {
 	})
 }
 
+// Redo rolls back and then reapplies the last migration.
 func (r *Runner) Redo(ctx context.Context, steps []Step) error {
 	return r.DB.WithAdvisoryLock(ctx, func(ctx context.Context) error {
 		if err := r.Down(ctx, steps); err != nil {
@@ -83,7 +86,7 @@ func (r *Runner) Redo(ctx context.Context, steps []Step) error {
 	})
 }
 
-// Go‑миграции
+// UpGo applies all pending Go migrations.
 func (r *Runner) UpGo(ctx context.Context, steps []GoStep) error {
 	return r.DB.WithAdvisoryLock(ctx, func(ctx context.Context) error {
 		applied, err := r.loadApplied(ctx)
@@ -103,6 +106,7 @@ func (r *Runner) UpGo(ctx context.Context, steps []GoStep) error {
 	})
 }
 
+// DownGo rolls back the last applied Go migration.
 func (r *Runner) DownGo(ctx context.Context, steps []GoStep) error {
 	return r.DB.WithAdvisoryLock(ctx, func(ctx context.Context) error {
 		applied, err := r.loadApplied(ctx)
@@ -169,6 +173,7 @@ func (r *Runner) applyGo(ctx context.Context, s GoStep, up bool) error {
 	return tx.Commit(ctx)
 }
 
+// DBVersion returns the current database migration version.
 func (r *Runner) DBVersion(ctx context.Context) (int64, error) {
 	rows, err := r.DB.Pool.Query(ctx, fmt.Sprintf("SELECT version FROM %s WHERE status='applied' ORDER BY version DESC LIMIT 1", r.SchemaTable))
 	if err != nil {
@@ -185,6 +190,7 @@ func (r *Runner) DBVersion(ctx context.Context) (int64, error) {
 	return 0, nil
 }
 
+// StatusRow represents a single row in the migration status table.
 type StatusRow struct {
 	Version   int64
 	Name      string
@@ -192,6 +198,7 @@ type StatusRow struct {
 	UpdatedAt time.Time
 }
 
+// Status returns the migration status for all migrations.
 func (r *Runner) Status(ctx context.Context) ([]StatusRow, error) {
 	q := fmt.Sprintf("SELECT version,name,status,updated_at FROM %s ORDER BY version", r.SchemaTable)
 	rows, err := r.DB.Pool.Query(ctx, q)
